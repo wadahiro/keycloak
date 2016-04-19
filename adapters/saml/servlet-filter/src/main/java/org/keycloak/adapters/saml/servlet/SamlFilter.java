@@ -61,11 +61,20 @@ import org.keycloak.saml.common.exceptions.ParsingException;
 public class SamlFilter implements Filter {
     protected SamlDeploymentContext deploymentContext;
     protected SessionIdMapper idMapper;
+    protected int maxBuffer = 100000;
     private final static Logger log = Logger.getLogger("" + SamlFilter.class);
 
     @Override
     public void init(final FilterConfig filterConfig) throws ServletException {
         deploymentContext = (SamlDeploymentContext)filterConfig.getServletContext().getAttribute(SamlDeploymentContext.class.getName());
+        try {
+            String bufferSetting = filterConfig.getInitParameter("keycloak.maxBuffer");
+            if (bufferSetting != null) {
+                maxBuffer = Integer.parseInt(bufferSetting);
+            }
+        } catch (NumberFormatException e) {
+            log.log(Level.WARNING, "The specified maxBuffer has not been set. Reason: {0}", new Object[] { e.getMessage() });
+        }
         if (deploymentContext != null) {
             idMapper = (SessionIdMapper)filterConfig.getServletContext().getAttribute(SessionIdMapper.class.getName());
             return;
@@ -136,7 +145,7 @@ public class SamlFilter implements Filter {
             log.fine("deployment not configured");
             return;
         }
-        FilterSamlSessionStore tokenStore = new FilterSamlSessionStore(request, facade, 100000, idMapper);
+        FilterSamlSessionStore tokenStore = new FilterSamlSessionStore(request, facade, maxBuffer, idMapper);
         boolean isEndpoint = request.getRequestURI().substring(request.getContextPath().length()).endsWith("/saml");
         SamlAuthenticator authenticator = null;
         if (isEndpoint) {
