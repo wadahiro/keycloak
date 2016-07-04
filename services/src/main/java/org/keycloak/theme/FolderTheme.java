@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Properties;
@@ -121,7 +122,7 @@ public class FolderTheme implements Theme {
 
         File file = new File(themeDir, "messages" + File.separator + baseBundlename + "_" + locale.toString() + ".properties");
         if (file.isFile()) {
-            m.load(new FileInputStream(file));
+            m.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
         }
         return m;
     }

@@ -19,6 +19,7 @@ package org.keycloak.theme;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Properties;
@@ -64,7 +65,7 @@ public class ClassLoaderTheme implements Theme {
 
         URL p = classLoader.getResource(themeRoot + "theme.properties");
         if (p != null) {
-            properties.load(p.openStream());
+            properties.load(new InputStreamReader(p.openStream(), "UTF-8"));
             this.parentName = properties.getProperty("parent");
             this.importName = properties.getProperty("import");
         } else {
@@ -127,7 +128,7 @@ public class ClassLoaderTheme implements Theme {
 
         URL url = classLoader.getResource(this.messageRoot + baseBundlename + "_" + locale.toString() + ".properties");
         if (url != null) {
-            m.load(url.openStream());
+            m.load(new InputStreamReader(url.openStream(), "UTF-8"));
         }
         return m;
     }
